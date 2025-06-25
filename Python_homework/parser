@@ -1,0 +1,84 @@
+import tabulate
+import requests
+from bs4 import BeautifulSoup
+import numpy as np
+
+names = [['Месяц', 'День', 'Минимум', 'Максимум', 'Средняя', 'Дисперсия', 'Ночь', 'Минимум', 'Максимум', 'Средняя',
+          'Дисперсия']]
+
+vtulka = ['https://pogoda.mail.ru/prognoz/paris/january-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/february-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/march-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/april-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/may-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/june-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/july-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/august-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/september-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/october-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/november-2022/', \
+          'https://pogoda.mail.ru/prognoz/paris/december-2022/']
+
+
+def parser(url):
+    neodata = []
+    arr = []
+
+    request = requests.get(url)
+    soup = BeautifulSoup(request.text, 'lxml')
+    quotes = soup.find_all(class_="day__temperature")
+
+    for quote in quotes:
+        neodata.append(quote.text)
+
+    for i in neodata:
+        arr.append(i.split())
+
+    arr = sum(arr, [])
+    arr = [word.rstrip("°") for word in arr]
+    arr = list(map(int, arr))
+
+    month = np.array(arr)
+    DAY = month[0::2]
+    NIGHT = month[1::2]
+    return DAY, NIGHT
+
+
+yearNAME = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь',
+            'Декабрь']
+n = 0
+
+
+def data(DAY, NIGHT):
+    return DAY.min(), DAY.max(), float(DAY.mean()), DAY.var(), NIGHT.min(), NIGHT.max(), float(
+        NIGHT.mean()), NIGHT.var()
+
+
+def dann(ssylka, NAME):
+    DAY, NIGHT = parser(ssylka)
+    mind, maxd, avgd, vard, minn, maxn, avgn, varn = (data(DAY, NIGHT))
+    if maxd > 0:
+        maxd = '+' + str(maxd)
+    if mind > 0:
+        mind = '+' + str(mind)
+    if avgd > 0:
+        avgd = '+' + str("%.1f" % avgd)
+    else:
+        avgd = str("%.1f" % avgd)
+    if maxn > 0:
+        maxn = '+' + str(maxn)
+    if minn > 0:
+        minn = '+' + str(minn)
+    if avgn > 0:
+        avgn = '+' + str("%.1f" % avgn)
+    else:
+        avgn = str("%.1f" % avgn)
+    names.append(
+        [str(NAME), 'день', mind, maxd, avgd, str("%.2f" % vard), 'ночь', minn, maxn, avgn, str("%.2f" % varn)])
+
+
+for i in yearNAME:
+    dann(vtulka[n], yearNAME[n])
+    n += 1
+
+print(tabulate.tabulate(names, tablefmt="fancy_grid", stralign='center'))

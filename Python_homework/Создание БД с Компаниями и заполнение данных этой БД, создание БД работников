@@ -1,0 +1,108 @@
+import sqlite3
+from sqlite3 import Error
+from worker import Employer
+import random as rd
+
+def create_connection(path):
+    connection = None
+    try:
+        connection = sqlite3.connect(path)
+        print("Connection to SQLite DB successfull")
+    except Error as e:
+        print(f"The error '{e}' occured")
+    return connection
+
+
+def execute_query(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        connection.commit()
+        print("Query executed successfully")
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+
+def execute_read_query(connection, query):
+    cursor = connection.cursor()
+    result = None
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return result
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+
+def main():
+    connection = create_connection("C:\\Programs\MIIT2022\sm_app.sqlite")
+
+    def create():
+        con = sqlite3.connect("main.db")
+        cur = con.cursor()
+        cur.execute("""CREATE TABLE IF NOT EXISTS company (
+                       name_of_company TEXT NOT NULL,
+                       info TEXT NOT NULL
+                    );""")
+        con.commit()
+        print("Table was created")
+
+    #create()
+
+    def insertd():
+        con = sqlite3.connect("main.db")
+        cur = con.cursor()
+        list_of_jobs = ['RZD', 'Ancor', 'Gasprom', 'Rusal', 'Roskosmos', 'CPPK', 'Dataline']
+        info = ['Railways', 'HR-company', 'Transnational energy company',  'Russian aluminum company',\
+                'State corporation for space activities', 'Suburban passenger company',\
+                'Russian data center operator and cloud service provider']
+        for i in range(len(info)):
+            cur.execute(f" INSERT INTO company (name_of_company, info) VALUES (?, ?);", (list_of_jobs[i], info[i]))
+            con.commit()
+        print('Data was added successfully')
+
+    #insertd()
+
+    def create1():
+        con = sqlite3.connect("main.db")
+        cur = con.cursor()
+        cur.execute("""CREATE TABLE IF NOT EXISTS job_registry (
+                       name_of_worker TEXT NOT NULL,
+                       companyy TEXT NOT NULL,
+                       date_of_start DATATIME,
+                       specialization TEXT,
+                       salary INTEGER,
+                       date_of_end DATATIME
+                    );""")
+        con.commit()
+        print("Table was created")
+
+    #create1()
+
+    def insertd1():
+        con = sqlite3.connect("main.db")
+        cur = con.cursor()
+        spisok = Employer.zapoln()
+        salary = ['45000', '120000', '65000', '89000', '150000', '78000', '200000', '63200', '90600', '205000', '135000', '68900']
+        date_of_end = ['19.01.2020', '30.05.2017', '01.03.2018', '03.11.2021', '29.12.2022', '-']
+        date_of_start = ['19.08.2001', '04.04.1956', '10.10.1972', '05.10.2003', '01.03.2002', '06.09.2005']
+        for i in range(len(spisok)):
+            cur.execute(f" INSERT INTO job_registry (name_of_worker, companyy, date_of_start, specialization, salary, date_of_end) VALUES (?, ?, ?, ?, ?, ?);", (spisok[i][0], spisok[i][3], rd.choice(date_of_start), spisok[i][2], rd.choice(salary), rd.choice(date_of_end)))
+            con.commit()
+
+    #insertd1()
+
+    connection = create_connection("main.db")
+    for row in execute_read_query(connection, '''SELECT * FROM JOB_REGISTRY'''):
+        print(row)
+    print(execute_read_query(connection, '''SELECT NAME_OF_COMPANY FROM COMPANY'''))
+    print(execute_read_query(connection, '''SELECT COUNT(NAME_OF_WORKER), COMPANYY FROM JOB_REGISTRY WHERE COMPANYY = 'RZD' and date_of_end = '-' '''))
+    print(execute_read_query(connection, '''SELECT COUNT(NAME_OF_WORKER), COMPANYY FROM JOB_REGISTRY WHERE COMPANYY = 'Ancor' and date_of_end = '-' '''))
+    print(execute_read_query(connection, '''SELECT COUNT(NAME_OF_WORKER), COMPANYY FROM JOB_REGISTRY WHERE COMPANYY = 'Gasprom' and date_of_end = '-' '''))
+    print(execute_read_query(connection, '''SELECT COUNT(NAME_OF_WORKER), COMPANYY FROM JOB_REGISTRY WHERE COMPANYY = 'Rusal' and date_of_end = '-' '''))
+    print(execute_read_query(connection, '''SELECT COUNT(NAME_OF_WORKER), COMPANYY FROM JOB_REGISTRY WHERE COMPANYY = 'Roskosmos' and date_of_end = '-' '''))
+    print(execute_read_query(connection, '''SELECT COUNT(NAME_OF_WORKER), COMPANYY FROM JOB_REGISTRY WHERE COMPANYY = 'CPPK' and date_of_end = '-' '''))
+    print(execute_read_query(connection, '''SELECT COUNT(NAME_OF_WORKER), COMPANYY FROM JOB_REGISTRY WHERE COMPANYY = 'Dataline' and date_of_end = '-' '''))
+
+if __name__ == "__main__":
+    main()

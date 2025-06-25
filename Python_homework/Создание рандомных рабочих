@@ -1,0 +1,33 @@
+import random as rd
+
+class Employer:
+    def __init__(self, name, age, specialization, list_of_jobs): # конструктор
+        self.name = name
+        self.age = age
+        self.specialization = specialization
+        self.list_of_jobs = list_of_jobs
+
+    def generation():
+        name = ['Alexey', 'Oleg', 'Ivan', 'Anton', 'Nikita', 'Andrey', 'Kirill', 'Oksana', 'Anna', 'Vera', 'Vlad', 'Natasha', 'Alexandr', 'Veronika', 'Valera', 'Anita']
+        list_of_jobs = ['RZD', 'Ancor', 'Gasprom', 'Rusal', 'Roskosmos', 'CPPK', 'Dataline']
+        specialization = ['IT', 'DataAnalytics', 'Designer', 'Economist', 'SysAdmin']
+        return Employer(rd.choice(name), rd.randint(18, 60), rd.choice(specialization), rd.choice(list_of_jobs))
+
+    def __str__(self):
+        return f'name: {self.name}, age: {self.age}, specialization: {self.specialization}, list_of_jobs: {self.list_of_jobs}'
+
+    work_employer = []
+
+    def zapoln():
+        work_employer = []
+        for i in range(5):
+            obj = Employer.generation()
+            work_employer.append([obj.name, obj.age, obj.specialization, obj.list_of_jobs])
+        return work_employer
+
+if __name__ == "__main__":
+    work_employer = []
+    for i in range(5):
+        obj = Employer.generation()
+        work_employer.append([obj.name, obj.age, obj.specialization, obj.list_of_jobs])
+    print(work_employer)
