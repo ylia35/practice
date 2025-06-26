@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher
 from handlers import router
 
 async def test():
-    bot = Bot(token='7008255063:AAFMaQBv_O5HMxFVmeN5gQuP4cTURGRBtqc')
+    bot = Bot(token='токен бота')
     dp = Dispatcher()
     dp.include_router(router)
     await dp.start_polling(bot)
